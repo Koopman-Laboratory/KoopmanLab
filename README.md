@@ -47,14 +47,14 @@ train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 
 We recommend you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]`, the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]`, the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
 In KNO model, The package provides two train methods and two test methods. If your scenario is single step prediction, you'd better use `train_single` method or use `train` setting `T_out = 1`. The package provides prediction result saving method and result ploting method in `test`.
-```
+``` python
 kno_model.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 kno_model.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T)
 kno_model.test_single(test_loader)
 kno_model.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_save = True, is_plot = True)
 ```
 In Koopman-Vit model, `train` and `test` method for training and testing the model in single step predicition scenario. Because of Koopman-ViT structure, `train_multi` and `test_multi` method provide multi-step iteration prediction, which meanse the model is iterated by `T_out` times in training and testing method. 
-```
+``` python
 koopmanVit_model.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 koopmanVit_model.test(test_loader)
 koopmanVit_model.train_multi(epochs=ep, trainloader = train_loader, evalloader = test_loader, T_out = T_out)
