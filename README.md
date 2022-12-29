@@ -30,7 +30,7 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
-Our package gives you a easy way to create a koopman model.
+Our package gives you an easy way to create a koopman model.
 ``` python
 import koopman as kp
 kno_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
