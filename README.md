@@ -5,6 +5,7 @@ The fundamental package for Koopman Neural Operator with Pytorch.
 KoopmanLab requires the following dependencies to be installed:
 - PyTorch >= 1.10
 - Numpy >= 1.23.2
+- Matplotlib >= 3.3.2
 
 Then you can install KoopmanLab package:
 
