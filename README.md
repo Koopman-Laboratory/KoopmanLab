@@ -30,7 +30,7 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
 Our package gives you a easy way to create a koopman model.
-```
+``` python
 import koopman as kp
 koopman_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
 koopman_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_len = 10, device = device)
@@ -39,7 +39,7 @@ koopman_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o,
 koopman_model.compile()
 ```
 If you use burgers equation and navier-stokes equation data by the link or shallow water data by PDEBench, there are three specifc data interface are provided.
-```
+``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
 train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T = T, sub = 1)
 train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 10, T = 40, type = "1e-3", sub = 1)
