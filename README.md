@@ -52,7 +52,7 @@ ViT_KNO.compile()
 # resolution: the spatial resolution of input data
 # patch_size: the size of each patch (i.e., token)
 # in_chans: the number of target variables in the data set
-# out_chans: the number of predicted variables by ViT - KNO , which is usually same as in_chans
+# out_chans: the number of predicted variables by ViT-KNO , which is usually same as in_chans
 # embed_dim: 
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
