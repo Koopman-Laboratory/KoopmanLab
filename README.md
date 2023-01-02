@@ -3,7 +3,7 @@
 https://pypi.org/project/koopmanlab/)
 [![Code Sizez](https://img.shields.io/github/languages/code-size/Koopman-Laboratory/KoopmanLab?label=Code%20Size)](
 https://github.com/Koopman-Laboratory/KoopmanLab)
-[![License](https://img.shields.io/pypi/l/koopmanlab?color=FF7000&label=License)]
+![License](https://img.shields.io/pypi/l/koopmanlab?color=FF7000&label=License)
 The fundamental package for Koopman Neural Operator with Pytorch.
 
 # Installation
