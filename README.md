@@ -42,11 +42,12 @@ MLP_KNO_2D.compile()
 # r: the power of the Koopman operator
 # T_in: the duration length of input data
 
-ViT_KNO = kp.model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
-            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, parallel = True, high_freq = True, device=device)
+ViT_KNO = kp.model.koopman_vit(decoder = "MLP", resolution=(64, 64), patch_size=(2, 2),
+            in_chans=1, out_chans=1, head_num=16, embed_dim=768, depth = 16, parallel = True, high_freq = True, device=device)
 ViT_KNO.compile()
 ## Parameter definitions:
-# depth: the depth of each head 9 # head_num: the number of heads
+# depth: the depth of each head 
+# head_num: the number of heads
 # resolution: the spatial resolution of input data
 # patch_size: the size of each patch (i.e., token)
 # in_chans:
