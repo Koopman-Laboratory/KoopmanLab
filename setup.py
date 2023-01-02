@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="koopmanlab",
-    version="0.0.1",
+    version="1.0.0",
     author="Wei Xiong, Tian Yang",
     author_email="xiongw21@mails.tsinghua.edu.cn",
     description="A library for Koopman Neural Operator with Pytorch",
