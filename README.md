@@ -43,7 +43,7 @@ MLP_KNO_2D.compile()
 # T_in: the duration length of input data
 
 ViT_KNO = kp.model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
-            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, depth=12, parallel = True, high_freq = True, device=device)
+            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, parallel = True, high_freq = True, device=device)
 ViT_KNO.compile()
 ## Parameter definitions:
 # depth: the depth of each head 9 # head_num: the number of heads
@@ -52,8 +52,7 @@ ViT_KNO.compile()
 # in_chans:
 # out_chans:
 # num_blocks:
-# embed_dim:
-# depth: 
+# embed_dim: 
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
 ```
