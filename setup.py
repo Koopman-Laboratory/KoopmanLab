@@ -20,7 +20,7 @@ setuptools.setup(
         'torch>=1.10',
         'torchvision>=0.13.1',
         'matplotlib>=3.3.2',
-        'numpy>=1.23.2',
+        'numpy>=1.14.5',
         'einops==0.5.0',
         'timm==0.6.11',
         'scipy==1.7.3',
