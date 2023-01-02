@@ -50,13 +50,19 @@ ViT_KNO.compile()
 # embed_dim:
 # depth: 
 # parallel: if data parallel is applied
-# high_freq: if high -frequency information complement is applied
+# high_freq: if high-frequency information complement is applied
 ```
 If you use burgers equation and navier-stokes equation data by the link or shallow water data by PDEBench, there are three specifc data interface are provided.
 ``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
-train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T = T, sub = 1)
-train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 10, T = 40, type = "1e-3", sub = 1)
+train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T_out = 40, sub = 1)
+train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 10, T_out = 40, type = "1e-3", sub = 1)
+## Parameter definitions:
+# path: the file path of the downloaded data set
+# T_in: the duration length of input data
+# T_out: the duration length required to predict
+# Type: the viscosity coefficient of navier-stokes equation data set.
+# sub: the down -sampling scaling factor. For instance , a scaling factor sub=2 acting on a 2-dimensional data with the spatial resoluion 64*64 will create a down -sampled space of 32*32. The same factor action on a 1 dimensional data with the spatial resoluion 1*64 implies a down -sampled space of 1*32.
 ```
 We recommend you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]`, the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]`, the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
