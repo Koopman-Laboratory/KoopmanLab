@@ -147,8 +147,8 @@ class koopman:
         return test_pred_full
 
 
-    def train(self, epochs, trainloader, step = 1, T = 40, evalloader = False):
-        T_eval = T
+    def train(self, epochs, trainloader, step = 1, T_out = 40, evalloader = False):
+        T_eval = T_out
         for ep in range(epochs):
             self.kernel.train()
             t1 = default_timer()
@@ -159,7 +159,7 @@ class koopman:
                 xx = xx.to(self.device)
                 yy = yy.to(self.device)
                 bs = xx.shape[0]
-                for t in range(0, T):
+                for t in range(0, T_out):
                     y = yy[..., t:t + 1]
 
                     im,im_re = self.kernel(xx)
@@ -175,7 +175,7 @@ class koopman:
                 loss = 5 * l_pred + 0.5 * l_recons
                 
                 train_pred_full += l_pred.item()
-                train_recons_full += l_recons.item()/T
+                train_recons_full += l_recons.item()/T_out
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -222,7 +222,7 @@ class koopman:
                 if ep == 0:
                     print("Epoch","Time","Train Recons MSE","Train Pred MSE")
                 print(ep, t2 - t1, train_recons_full, train_pred_full)
-    def test(self, testloader, step = 1, T_eval = 40, path = False, is_save = False, is_plot = False):
+    def test(self, testloader, step = 1, T_out = 40, path = False, is_save = False, is_plot = False):
         time_error = torch.zeros([T_eval,1])
         test_pred_full = 0
         test_recons_full = 0
@@ -234,7 +234,7 @@ class koopman:
                 xx = xx.to(self.device)
                 yy = yy.to(self.device)
                 l_recons = 0
-                for t in range(0, T_eval):
+                for t in range(0, T_out):
                     y = yy[..., t:t + 1]
                     im, im_re = self.kernel(xx)
                     l_recons += self.loss(im_re.reshape(bs, -1), xx.reshape(bs, -1))
@@ -246,14 +246,14 @@ class koopman:
                     time_error[t] = time_error[t] + t_error.item()
                     xx = torch.cat((xx[..., 1:], im[...,-1:]), dim=-1)
 
-                test_recons_full += l_recons.item() / T_eval
+                test_recons_full += l_recons.item() / T_out
                 l_pred = self.loss(pred.reshape(bs, -1), yy.reshape(bs, -1))
                 test_pred_full += l_pred.item()
                 if(loc == 0 & is_save):
                     torch.save({"pred":pred, "yy":yy}, path+ "pred_yy.pt")
                 
                 if(loc == 0 & is_plot):
-                    for i in range(T_eval):
+                    for i in range(T_out):
                         plt.subplot(1,3,1)
                         plt.title("Predict")
                         plt.imshow(pred[0,...,i].cpu().detach().numpy())
@@ -303,7 +303,7 @@ class koopman_vit:
         self.high_freq = self.high_freq
         self.loss = torch.nn.MSELoss()
     def compile(self):
-        self.kernel = vit.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, embed_dim = self.embed_dim, settings = self.decoder).to(self.device)
+        self.kernel = koopmanViT.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, num_blocks=self.num_blocks, embed_dim = self.embed_dim, depth=self.depth, settings = self.decoder).to(self.device)
         if self.parallel:
             self.kernel = torch.nn.DataParallel(self.kernel)
         self.params = utils.count_params(self.kernel)
@@ -317,8 +317,8 @@ class koopman_vit:
         if not step_size == False:
             self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=step_size, gamma=gamma)
         
-    def train_multi(self, epochs, trainloader, step = 1, T = 10, evalloader = False):
-        T_eval = T
+    def train_multi(self, epochs, trainloader, T_out = 10, evalloader = False):
+        T_eval = T_out
         for ep in range(epochs):
             self.kernel.train()
             t1 = default_timer()
@@ -329,7 +329,7 @@ class koopman_vit:
                 xx = xx.to(self.device) # [batchsize,1,x,y]
                 yy = yy.to(self.device) # [batchsize,T,x,y]
                 bs = xx.shape[0]
-                for t in range(0, T):
+                for t in range(0, T_out):
                     y = yy[:, t:t + 1]
                     im,im_re = self.kernel(xx)
                     l_recons += self.loss(im_re.reshape(bs, -1), xx.reshape(bs, -1))
@@ -345,7 +345,7 @@ class koopman_vit:
                 loss = 5 * l_pred + 0.5 * l_recons
                 
                 train_pred_full += l_pred.item()
-                train_recons_full += l_recons.item()/T
+                train_recons_full += l_recons.item()/T_out
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -395,8 +395,8 @@ class koopman_vit:
                     print("Epoch","Time","Train Recons MSE","Train Pred MSE")
                 print(ep, t2 - t1, train_recons_full, train_pred_full)
     
-    def test_multi(self, testloader, step = 1, T_eval = 5, path = False, is_save = False, is_plot = False):
-        time_error = torch.zeros([T_eval,1])
+    def test_multi(self, testloader, step = 1, T_out = 5, path = False, is_save = False, is_plot = False):
+        time_error = torch.zeros([T_out,1])
         test_pred_full = 0
         test_recons_full = 0
         loc = 0
@@ -407,7 +407,7 @@ class koopman_vit:
                 xx = xx.to(self.device)
                 yy = yy.to(self.device)
                 l_recons = 0
-                for t in range(0, T_eval):
+                for t in range(0, T_out):
                     y = yy[:, t:t + 1]
                     im, im_re = self.kernel(xx)
                     
@@ -423,7 +423,7 @@ class koopman_vit:
                         pred = torch.cat((pred, im), 1)
                     time_error[t] = time_error[t] + t_error.item()
     
-                test_recons_full += l_recons.item() / T_eval
+                test_recons_full += l_recons.item() / T_out
                 l_pred = self.loss(pred.reshape(bs, -1), yy.reshape(bs, -1))
                 test_pred_full += l_pred.item()
 
@@ -431,7 +431,7 @@ class koopman_vit:
                     torch.save({"pred":pred, "yy":yy}, path+ "pred_yy.pt")
                 
                 if(loc == 0 & is_plot):
-                    for i in range(T_eval):
+                    for i in range(T_out):
                         plt.subplot(1,3,1)
                         plt.title("Predict")
                         plt.imshow(pred[0,i].cpu().detach().numpy())
@@ -514,8 +514,8 @@ class koopman_vit:
                     print("Epoch","Time","Train Recons MSE","Train Pred MSE")
                 print(ep, t2 - t1, train_recons_full, train_pred_full)
                 
-    def test_single(self, testloader, T_eval = 1, path = False, is_save = False, is_plot = False):
-        time_error = torch.zeros([T_eval,1])
+    def test_single(self, testloader, T_out = 1, path = False, is_save = False, is_plot = False):
+        time_error = torch.zeros([T_out,1])
         test_pred_full = 0
         test_recons_full = 0
         loc = 0
@@ -527,7 +527,7 @@ class koopman_vit:
                 xx = xx.to(self.device)
                 yy = yy.to(self.device)
                 l_recons = 0
-                for t in range(0, T_eval):
+                for t in range(0, T_out):
                     y = yy[:, t:t + 1]
                     im, im_re = self.kernel(xx)
                     
@@ -542,7 +542,7 @@ class koopman_vit:
                         pred = torch.cat((pred, im), 1)
                     time_error[t] = time_error[t] + t_error.item()
     
-                test_recons_full += l_recons.item() / T_eval
+                test_recons_full += l_recons.item() / T_out
                 l_pred = self.loss(pred.reshape(bs, -1), yy.reshape(bs, -1))
                 test_pred_full += l_pred.item()
 
@@ -550,7 +550,7 @@ class koopman_vit:
                     torch.save({"pred":pred, "yy":yy}, path+ "pred_yy.pt")
                 
                 if(loc == 0 & is_plot):
-                    for i in range(T_eval):
+                    for i in range(T_out):
                         plt.subplot(1,3,1)
                         plt.title("Predict")
                         plt.imshow(pred[0,i].cpu().detach().numpy())
