@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 from timeit import default_timer
 
 class koopman:
-    def __init__(self, backbone = "KNO1d", autoencoder = "MLP", o = 16, m = 16, r = 8, t_len = 1,device = False):
+    def __init__(self, backbone = "KNO1d", autoencoder = "MLP", o = 16, m = 16, r = 8, t_in = 1,device = False):
         self.backbone = backbone
         self.autoencoder = autoencoder
         self.operator_size = o
         self.modes = m
         self.decompose = r
         self.device = device
-        self.t_len = t_len
+        self.t_in = t_in
         # Core Model
         self.params = 0
         self.kernel = False
@@ -34,12 +34,12 @@ class koopman:
             decoder = kno.decoder_conv1d(self.t_len, self.operator_size)
             print("The autoencoder type is Conv1d.")
         elif self.autoencoder == "Conv2d":
-            encoder = kno.encoder_conv2d(self.t_len, self.operator_size)
-            decoder = kno.decoder_conv2d(self.t_len, self.operator_size)
+            encoder = kno.encoder_conv2d(self.t_in, self.operator_size)
+            decoder = kno.decoder_conv2d(self.t_in, self.operator_size)
             print("The autoencoder type is Conv2d.")
         else:
-#            encoder = kno.encoder_mlp(self.t_len, self.operator_size)
-#            decoder = kno.decoder_mlp(self.t_len, self.operator_size)
+#            encoder = kno.encoder_mlp(self.t_in, self.operator_size)
+#            decoder = kno.decoder_mlp(self.t_in, self.operator_size)
 #            print("The autoencoder type is MLP.")
             print("Wrong!")
         if self.backbone == "KNO1d":
