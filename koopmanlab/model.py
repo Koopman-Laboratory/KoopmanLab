@@ -26,12 +26,12 @@ class koopman:
         self.loss = torch.nn.MSELoss()
     def compile(self):
         if self.autoencoder == "MLP":
-            encoder = kno.encoder_mlp(self.t_len, self.operator_size)
-            decoder = kno.decoder_mlp(self.t_len, self.operator_size)
+            encoder = kno.encoder_mlp(self.t_in, self.operator_size)
+            decoder = kno.decoder_mlp(self.t_in, self.operator_size)
             print("The autoencoder type is MLP.")
         elif self.autoencoder == "Conv1d":
-            encoder = kno.encoder_conv1d(self.t_len, self.operator_size)
-            decoder = kno.decoder_conv1d(self.t_len, self.operator_size)
+            encoder = kno.encoder_conv1d(self.t_in, self.operator_size)
+            decoder = kno.decoder_conv1d(self.t_in, self.operator_size)
             print("The autoencoder type is Conv1d.")
         elif self.autoencoder == "Conv2d":
             encoder = kno.encoder_conv2d(self.t_in, self.operator_size)
