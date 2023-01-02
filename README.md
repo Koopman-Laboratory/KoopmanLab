@@ -41,7 +41,7 @@ MLP_KNO_2D.compile()
 # f: the number of frequency modes below frequency truncation threshold
 # r: the power of the Koopman operator
 # T_in: the duration length of input data
-# device : if CPU or CUDA is used for calculating
+# device : if CPU or GPU is used for calculating
 
 ViT_KNO = kp.model.koopman_vit(decoder = "MLP", resolution=(64, 64), patch_size=(2, 2),
             in_chans=1, out_chans=1, head_num=16, embed_dim=768, depth = 16, parallel = True, high_freq = True, device=device)
