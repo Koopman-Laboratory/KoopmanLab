@@ -41,6 +41,7 @@ MLP_KNO_2D.compile()
 # f: the number of frequency modes below frequency truncation threshold
 # r: the power of the Koopman operator
 # T_in: the duration length of input data
+# device : if CPU or CUDA is used for calculating
 
 ViT_KNO = kp.model.koopman_vit(decoder = "MLP", resolution=(64, 64), patch_size=(2, 2),
             in_chans=1, out_chans=1, head_num=16, embed_dim=768, depth = 16, parallel = True, high_freq = True, device=device)
@@ -50,9 +51,8 @@ ViT_KNO.compile()
 # head_num: the number of heads
 # resolution: the spatial resolution of input data
 # patch_size: the size of each patch (i.e., token)
-# in_chans:
-# out_chans:
-# num_blocks:
+# in_chans: the number of target variables in the data set
+# out_chans: the number of predicted variables by ViT - KNO , which is usually same as in_chans
 # embed_dim: 
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
