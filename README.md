@@ -62,7 +62,7 @@ train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 
 # T_in: the duration length of input data
 # T_out: the duration length required to predict
 # Type: the viscosity coefficient of navier-stokes equation data set.
-# sub: the down -sampling scaling factor. For instance , a scaling factor sub=2 acting on a 2-dimensional data with the spatial resoluion 64*64 will create a down -sampled space of 32*32. The same factor action on a 1 dimensional data with the spatial resoluion 1*64 implies a down -sampled space of 1*32.
+# sub: the down-sampling scaling factor. For instance, a scaling factor sub=2 acting on a 2-dimensional data with the spatial resoluion 64*64 will create a down-sampled space of 32*32. The same factor action on a 1 dimensional data with the spatial resoluion 1*64 implies a down-sampled space of 1*32.
 ```
 We recommend you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]`, the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]`, the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
