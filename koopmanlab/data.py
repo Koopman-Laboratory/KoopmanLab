@@ -4,7 +4,6 @@ import scipy.io
 import numpy as np
 
 def burgers(path, batch_size = 64, sub = 32):
-
     f = scipy.io.loadmat(path)
     x_data = f['a'][:,::sub]
     y_data = f['u'][:,::sub]
@@ -29,7 +28,7 @@ def burgers(path, batch_size = 64, sub = 32):
     test_loader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(x_test, y_test), batch_size=batch_size, shuffle=False)
     return train_loader, test_loader
 
-def shallow_water(path, batch_size = 20, T_in = 10, T = 20, sub = 1):
+def shallow_water(path, batch_size = 20, T_in = 10, T_out = 20, sub = 1):
     ntrain = 900
     ntest = 100
     total = ntrain + ntest
@@ -38,10 +37,10 @@ def shallow_water(path, batch_size = 20, T_in = 10, T = 20, sub = 1):
     data = torch.tensor(data,dtype=torch.float32)
     # Traning data
     train_a = data[:ntrain,::sub,::sub,:T_in]
-    train_u = data[:ntrain,::sub,::sub,T_in:T+T_in]
+    train_u = data[:ntrain,::sub,::sub,T_in:T_out+T_in]
     # Testing data
     test_a = data[-ntest:,::sub,::sub,:T_in]
-    test_u = data[-ntest:,::sub,::sub,T_in:T+T_in]
+    test_u = data[-ntest:,::sub,::sub,T_in:T_out+T_in]
     
     print("Shallow Water Equations Dataset has been loaded successfully!")
     print("X train shape:", train_a.shape, "Y train shape:", train_u.shape)
@@ -52,7 +51,7 @@ def shallow_water(path, batch_size = 20, T_in = 10, T = 20, sub = 1):
     
     return train_loader, test_loader
     
-def navier_stokes(path, batch_size = 20, T_in = 10, T = 40, type = "1e-3", sub = 1,reshape = False):
+def navier_stokes(path, batch_size = 20, T_in = 10, T_out = 40, type = "1e-3", sub = 1,reshape = False):
     if type == "1e-3":
         ntrain = 1000
         ntest = 200
@@ -65,10 +64,10 @@ def navier_stokes(path, batch_size = 20, T_in = 10, T = 40, type = "1e-3", sub =
 
         # Traning data
         train_a = data[:ntrain,::sub,::sub,:T_in]
-        train_u = data[:ntrain,::sub,::sub,T_in:T+T_in]
+        train_u = data[:ntrain,::sub,::sub,T_in:T_out+T_in]
         # Testing data
         test_a = data[-ntest:,::sub,::sub,:T_in]
-        test_u = data[-ntest:,::sub,::sub,T_in:T+T_in]
+        test_u = data[-ntest:,::sub,::sub,T_in:T_out+T_in]
 
         if reshape:
             train_a = train_a.permute(reshape)
@@ -92,10 +91,10 @@ def navier_stokes(path, batch_size = 20, T_in = 10, T = 40, type = "1e-3", sub =
 
         # Traning data
         train_a = data[:ntrain,::sub,::sub,:T_in]
-        train_u = data[:ntrain,::sub,::sub,T_in:T+T_in]
+        train_u = data[:ntrain,::sub,::sub,T_in:T_out+T_in]
         # Testing data
         test_a = data[-ntest:,::sub,::sub,:T_in]
-        test_u = data[-ntest:,::sub,::sub,T_in:T+T_in]
+        test_u = data[-ntest:,::sub,::sub,T_in:T_out+T_in]
         
         if reshape:
             train_a = train_a.permute(reshape)
@@ -121,10 +120,10 @@ def navier_stokes(path, batch_size = 20, T_in = 10, T = 40, type = "1e-3", sub =
 
         # Traning data
         train_a = data[:ntrain,::sub,::sub,:T_in]
-        train_u = data[:ntrain,::sub,::sub,T_in:T+T_in]
+        train_u = data[:ntrain,::sub,::sub,T_in:T_out+T_in]
         # Testing data
         test_a = data[-ntest:,::sub,::sub,:T_in]
-        test_u = data[-ntest:,::sub,::sub,T_in:T+T_in]
+        test_u = data[-ntest:,::sub,::sub,T_in:T_out+T_in]
         
         if reshape:
             train_a = train_a.permute(reshape)
@@ -145,9 +144,7 @@ def navier_stokes(path, batch_size = 20, T_in = 10, T = 40, type = "1e-3", sub =
         
     return train_loader, test_loader
 
-def navier_stokes_single(path, batch_size = 64, T_in = 10, T = 40, type = "1e-4", sub = 1,reshape = False):
-        
-    path = "/home/xiongwei/koopman/data/ns_data_V1e-4_N20_T50_R256test.mat"
+def navier_stokes_single(path, batch_size = 64, T_in = 10, T_out = 40, type = "1e-4", sub = 1,reshape = False):  
     f = scipy.io.loadmat(path)
     print(f["a"].shape)
     print(f["u"].shape)
