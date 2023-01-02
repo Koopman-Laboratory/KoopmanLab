@@ -89,6 +89,8 @@ ViT_KNO.test_multi(test_loader)
 Having trained your own model, save module is provided in our package. Saved variable has three attribute. `koopman` is the model class variable, which means save `kno_model` variable. `model` is the trained model variable, which means save `kno_model.kernel` variable. `model_params` is the parameters dictionary of trained model variable, which means `kno_model.kernel.state_dict()` variable.
 ``` python
 MLP_KNO_2D.save(save_path)
+## Parameter definitions:
+# save_path: the file path of the result saving
 ```
 # Cite KoopmanLab
 If you use KoopmanLab package for academic research, you are encouraged to cite the following paper:
