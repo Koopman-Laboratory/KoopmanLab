@@ -57,6 +57,10 @@ ViT_KNO.compile()
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
 ```
+Having compiled the model, optimizer setting is indispensable. If you want some more custom optimizer and scheduler, you could use PyTorch method to create them and assign them to koopman model object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
+``` python
+MLP_KNO_2D.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
+```
 If you use burgers equation and navier-stokes equation data by the link or shallow water data by PDEBench, there are three specifc data interface are provided.
 ``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
