@@ -1,4 +1,8 @@
+import io
 import setuptools
+
+with io.open("README.md", "r", encoding="utf-8") as f:
+    long_description = f.read()
 
 setuptools.setup(
     name="koopmanlab",
@@ -6,8 +10,8 @@ setuptools.setup(
     author="Wei Xiong, Tian Yang",
     author_email="xiongw21@mails.tsinghua.edu.cn",
     description="A library for Koopman Neural Operator with Pytorch",
-    long_description="",
-    long_description_content_type="",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/Koopman-Laboratory/KoopmanLab",
     packages=setuptools.find_packages(),
     classifiers=[
