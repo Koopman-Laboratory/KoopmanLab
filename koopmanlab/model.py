@@ -1,6 +1,6 @@
 from . import kno
 from . import utils
-from . import vit
+from . import KoopmanViT
 
 import os
 import torch
