@@ -300,7 +300,7 @@ class koopman_vit:
         self.scheduler = False
         self.device = device
         self.parallel = parallel
-        self.high_freq = self.high_freq
+        self.high_freq = high_freq
         self.loss = torch.nn.MSELoss()
     def compile(self):
         self.kernel = koopmanViT.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, num_blocks=self.num_blocks, embed_dim = self.embed_dim, depth=self.depth, settings = self.decoder).to(self.device)
