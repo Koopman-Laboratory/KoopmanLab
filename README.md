@@ -68,10 +68,10 @@ We recommend you process your data by pytorch method `torch.utils.data.DataLoade
 
 In KNO model, The package provides two train methods and two test methods. If your scenario is single step prediction, you'd better use `train_single` method or use `train` setting `T_out = 1`. The package provides prediction result saving method and result ploting method in `test`.
 ``` python
-kno_model.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
-kno_model.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T)
-kno_model.test_single(test_loader)
-kno_model.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_save = True, is_plot = True)
+MLP_KNO_2D.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
+MLP_KNO_2D.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T)
+MLP_KNO_2D.test_single(test_loader)
+MLP_KNO_2D.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_save = True, is_plot = True)
 ```
 In Koopman-Vit model, `train` and `test` method for training and testing the model in single step predicition scenario. Because of Koopman-ViT structure, `train_multi` and `test_multi` method provide multi-step iteration prediction, which meanse the model is iterated by `T_out` times in training and testing method. 
 ``` python
@@ -88,7 +88,7 @@ ViT_KNO.test_multi(test_loader)
 ```
 Having trained your own model, save module is provided in our package. Saved variable has three attribute. `koopman` is the model class variable, which means save `kno_model` variable. `model` is the trained model variable, which means save `kno_model.kernel` variable. `model_params` is the parameters dictionary of trained model variable, which means `kno_model.kernel.state_dict()` variable.
 ``` python
-kno_model.save(save_path)
+MLP_KNO_2D.save(save_path)
 ```
 # Cite KoopmanLab
 If you use KoopmanLab package for academic research, you are encouraged to cite the following paper:
