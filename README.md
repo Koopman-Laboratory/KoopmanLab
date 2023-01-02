@@ -32,7 +32,7 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 
 Our package gives you an easy way to create a koopman model.
 ``` python
-import koopman as kp
+import koopmanlab as kp
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_in = 10, device = device)
 MLP_KNO_2D.compile()
