@@ -282,7 +282,7 @@ class koopman:
 
 class koopman_vit:
     def __init__(self, decoder = "MLP", L_layers = 16, resolution=(256, 256), patch_size=(4, 4),
-            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, depth=12, high_freq = True, parallel = False, device = False):
+            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, high_freq = True, parallel = False, device = False):
         # Model Hyper-parameters
         self.decoder = decoder
         self.resolution = resolution
@@ -291,7 +291,7 @@ class koopman_vit:
         self.out_chans = out_chans
         self.embed_dim = embed_dim
         self.num_blocks = num_blocks
-        self.depth = depth
+        self.L_layers = L_layers
         # Core Model
         self.params = 0
         self.kernel = False
@@ -303,7 +303,7 @@ class koopman_vit:
         self.high_freq = high_freq
         self.loss = torch.nn.MSELoss()
     def compile(self):
-        self.kernel = koopmanViT.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, num_blocks=self.num_blocks, embed_dim = self.embed_dim, depth=self.depth, settings = self.decoder).to(self.device)
+        self.kernel = koopmanViT.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, num_blocks=self.num_blocks, embed_dim = self.embed_dim, depth=self.L_layers, settings = self.decoder).to(self.device)
         if self.parallel:
             self.kernel = torch.nn.DataParallel(self.kernel)
         self.params = utils.count_params(self.kernel)
