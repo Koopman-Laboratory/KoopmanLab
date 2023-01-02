@@ -50,7 +50,7 @@ class Mlp(nn.Module):
 
 
 class AFNO2D(nn.Module):
-    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1):
+    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1, embed_dim=768, high_freq = True):
         super().__init__()
         assert hidden_size % num_blocks == 0, f"hidden_size {hidden_size} should be divisble by num_blocks {num_blocks}"
 
@@ -66,9 +66,14 @@ class AFNO2D(nn.Module):
         self.b1 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size * self.hidden_size_factor))
         self.w2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size * self.hidden_size_factor, self.block_size))
         self.b2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size))
-
+        
+        self.high_freq = high_freq
+        self.w = nn.Conv2d(embed_dim, embed_dim, 1) # High Frequency
     def forward(self, x):
-        bias = x
+        if self.high_freq:
+            bias = self.w(x.permute([0,3,1,2])).permute([0,2,3,1])
+        else:
+            bias = x
 
         dtype = x.dtype
         x = x.float()
@@ -86,16 +91,18 @@ class AFNO2D(nn.Module):
         total_modes = H // 2 + 1
         kept_modes = int(total_modes * self.hard_thresholding_fraction)
 
-        o1_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.relu(
+        o1_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.leaky_relu(
             torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].real, self.w1[0]) - \
             torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].imag, self.w1[1]) + \
-            self.b1[0]
+            self.b1[0],
+            negative_slope = 0.01
         )
 
-        o1_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.relu(
+        o1_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.leaky_relu(
             torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].imag, self.w1[0]) + \
             torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].real, self.w1[1]) + \
-            self.b1[1]
+            self.b1[1],
+            negative_slope = 0.01
         )
 
         o2_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes]  = (
@@ -116,8 +123,10 @@ class AFNO2D(nn.Module):
         x = x.reshape(B, H, W // 2 + 1, C)
         x = torch.fft.irfft2(x, s=(H, W), dim=(1,2), norm="ortho")
         x = x.type(dtype)
-
-        return x + bias
+        # Linear
+        x = F.relu(x)
+        x = x + bias
+        return x
 
 
 class Block(nn.Module):
@@ -132,11 +141,13 @@ class Block(nn.Module):
             double_skip=True,
             num_blocks=8,
             sparsity_threshold=0.01,
-            hard_thresholding_fraction=1.0
+            hard_thresholding_fraction=1.0,
+            embed_dim = 768,
+            high_freq = True
         ):
         super().__init__()
         self.norm1 = norm_layer(dim)
-        self.filter = AFNO2D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction) 
+        self.filter = AFNO2D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction, embed_dim = embed_dim, high_freq = high_freq) 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         #self.drop_path = nn.Identity()
         self.norm2 = norm_layer(dim)
@@ -163,7 +174,7 @@ class Block(nn.Module):
 class ViT(nn.Module):
     def __init__(
             self,
-            resolution=(720, 1440),
+            img_size=(720, 1440),
             patch_size=(16, 16),
             in_chans=2,
             out_chans=2,
@@ -175,10 +186,11 @@ class ViT(nn.Module):
             num_blocks=16,
             sparsity_threshold=0.01,
             hard_thresholding_fraction=1.0,
-            settings = "MLP"
+            settings = "MLP",
+            high_freq = True
         ):
         super().__init__()
-        self.resolution = resolution
+        self.img_size = img_size
         self.patch_size = patch_size
         self.in_chans = in_chans
         self.out_chans = out_chans
@@ -189,7 +201,7 @@ class ViT(nn.Module):
         self.settings = settings
         norm_layer = partial(nn.LayerNorm, eps=1e-6)
 
-        self.patch_embed = PatchEmbed(img_size=img_size, patch_size=self.patch_size, in_chans=self.in_chans, embed_dim=embed_dim)
+        self.patch_embed = PatchEmbed(img_size=self.img_size, patch_size=self.patch_size, in_chans=self.in_chans, embed_dim=embed_dim)
         num_patches = self.patch_embed.num_patches
 
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches, embed_dim))
@@ -202,7 +214,7 @@ class ViT(nn.Module):
 
         self.blocks = nn.ModuleList([
             Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
-            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction) 
+            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim, high_freq = high_freq) 
         for i in range(self.depth)])
 
         self.norm = norm_layer(embed_dim)
