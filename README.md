@@ -33,11 +33,24 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 Our package gives you an easy way to create a koopman model.
 ``` python
 import koopman as kp
-kno_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
-kno_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_len = 10, device = device)
-# koopmanVit_model = model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
-            in_chans=1, out_chans=1, parallel = True, high_freq = True, device=device)
-kno_model.compile()
+MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
+MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_len = 10, device = device)
+MLP_KNO_2D.compile()
+
+ViT_KNO = model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
+            in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, depth=12, parallel = True, high_freq = True, device=device)
+ViT_KNO.compile()
+## Parameter definitions:
+# depth: the depth of each head 9 # head_num: the number of heads
+# resolution: the spatial resolution of input data
+# patch_size: the size of each patch (i.e., token)
+# in_chans:
+# out_chans:
+# num_blocks:
+# embed_dim:
+# depth: 
+# parallel: if data parallel is applied
+# high_freq: if high -frequency information complement is applied
 ```
 If you use burgers equation and navier-stokes equation data by the link or shallow water data by PDEBench, there are three specifc data interface are provided.
 ``` python
