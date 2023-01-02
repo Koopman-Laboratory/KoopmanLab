@@ -80,8 +80,8 @@ MLP_KNO_2D.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_s
 ```
 In Koopman-Vit model, `train` and `test` method for training and testing the model in single step predicition scenario. Because of Koopman-ViT structure, `train_multi` and `test_multi` method provide multi-step iteration prediction, which meanse the model is iterated by `T_out` times in training and testing method. 
 ``` python
-ViT_KNO.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
-ViT_KNO.test(test_loader)
+ViT_KNO.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
+ViT_KNO.test_single(test_loader)
 ViT_KNO.train_multi(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T_out)
 ViT_KNO.test_multi(test_loader)
 ## Parameter definitions:
