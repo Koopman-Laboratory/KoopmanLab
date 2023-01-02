@@ -1,4 +1,6 @@
 # KoopmanLab
+[![PyPI Downloads](https://img.shields.io/pypi/v/koopmanlab)](https://pypi.org/project/koopmanlab/)
+
 The fundamental package for Koopman Neural Operator with Pytorch.
 
 # Installation
