@@ -42,7 +42,7 @@ MLP_KNO_2D.compile()
 # r: the power of the Koopman operator
 # T_in: the duration length of input data
 
-ViT_KNO = model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
+ViT_KNO = kp.model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
             in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, depth=12, parallel = True, high_freq = True, device=device)
 ViT_KNO.compile()
 ## Parameter definitions:
