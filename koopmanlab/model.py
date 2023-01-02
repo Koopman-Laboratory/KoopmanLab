@@ -223,7 +223,7 @@ class koopman:
                     print("Epoch","Time","Train Recons MSE","Train Pred MSE")
                 print(ep, t2 - t1, train_recons_full, train_pred_full)
     def test(self, testloader, step = 1, T_out = 40, path = False, is_save = False, is_plot = False):
-        time_error = torch.zeros([T_eval,1])
+        time_error = torch.zeros([T_out,1])
         test_pred_full = 0
         test_recons_full = 0
         loc = 0
