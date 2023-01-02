@@ -36,6 +36,10 @@ import koopman as kp
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_len = 10, device = device)
 MLP_KNO_2D.compile()
+## Parameter definitions:
+# o: the dimension of the learned Koopman operator
+# f: the number of frequency modes below frequency truncation threshold
+# r: the power of the Koopman operator
 
 ViT_KNO = model.koopman_vit(decoder = "MLP", L_layers = 16, resolution=(64, 64), patch_size=(2, 2),
             in_chans=1, out_chans=1, num_blocks=16, embed_dim=768, depth=12, parallel = True, high_freq = True, device=device)
