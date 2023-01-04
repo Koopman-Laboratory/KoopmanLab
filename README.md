@@ -8,6 +8,10 @@ https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 
 The fundamental package for Koopman Neural Operator with Pytorch.
 
+For more information, please refer to the following: 
+
+  - Wei Xiong, Muyuan Ma, Pei Sun and Yang Tian. "[KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023).
+
 # Installation
 KoopmanLab requires the following dependencies to be installed:
 - PyTorch >= 1.10
