@@ -123,4 +123,5 @@ If you use KoopmanLab package for academic research, you are encouraged to cite 
 }
 ```
 
-
+# License
+[GPL-3.0 License](https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
