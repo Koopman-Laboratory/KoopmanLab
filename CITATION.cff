@@ -7,7 +7,7 @@ authors:
 - family-names: "Tian"
   given-names: "Yang"
   orcid: "https://orcid.org/0000-0003-1970-0413"
-title: "KoopmanLab"
+title: "KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations"
 version: 1.0.1
 doi: 10.48550/arXiv.2301.01104
 date-released: 2023-01-03
