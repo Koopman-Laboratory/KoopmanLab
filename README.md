@@ -111,7 +111,12 @@ MLP_KNO_2D.save(save_path)
 # Cite KoopmanLab
 If you use KoopmanLab package for academic research, you are encouraged to cite the following paper:
 ```
-
+@article{xiong2023koopmanlab,
+  title={KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations},
+  author={Xiong, Wei and Ma, Muyuan and Sun, Pei and Tian, Yang},
+  journal={arXiv preprint arXiv:2301.01104},
+  year={2023}
+}
 ```
 
 
