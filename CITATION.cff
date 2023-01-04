@@ -26,7 +26,7 @@ preferred-citation:
     given-names: "Yang"
     orcid: "https://orcid.org/0000-0003-1970-0413"
   doi: "10.48550/arXiv.2301.01104"
-  journal: "ArXiv Preprint"
+  journal: "arXiv preprint arXiv:2301.01104"
   month: 1
   title: "KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations"
   year: 2023
