@@ -112,7 +112,7 @@ MLP_KNO_2D.save(save_path)
 ## Parameter definitions:
 # save_path: the file path of the result saving
 ```
-# Cite KoopmanLab
+# Citation
 If you use KoopmanLab package for academic research, you are encouraged to cite the following paper:
 ```
 @article{xiong2023koopmanlab,
