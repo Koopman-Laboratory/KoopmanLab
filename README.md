@@ -8,7 +8,7 @@ https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 
 Thisi is a package for Koopman Neural Operator with Pytorch.
 
-For more information, please refer to the following paper, where we provided detailed mathematical derivations, computational designs, and code explanations. 
+For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
 
   - Wei Xiong, Muyuan Ma, Pei Sun and Yang Tian. "[KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023).
 
