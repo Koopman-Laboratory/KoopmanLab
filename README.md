@@ -41,7 +41,7 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
-Our package gives you an easy way to create a koopman model.
+Our package provides an easy way to create a Koopman neural operator.
 ``` python
 import koopmanlab as kp
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
@@ -68,7 +68,7 @@ ViT_KNO.compile()
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
 ```
-Once the model is compiled, optimizer setting is required to run your own experiments. If you want a more customized setting of optimizer and scheduler, you could use any PyTorch method to create them and assign them to koopman model object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
+Once the model is compiled, optimizer setting is required to run your own experiments. If you want a more customized setting of optimizer and scheduler, you could use any PyTorch method to create them and assign them to Koopman neural operator object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
 ``` python
 MLP_KNO_2D.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
 ```
@@ -86,7 +86,7 @@ train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 
 ```
 We recommend that you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]` and the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]` and the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
-The KoopmanLab provides two training and two testing methods of the compact KNO sub-family. If your scenario is single step prediction, you can consider to use `train_single` method or use `train` setting `T_out = 1`. Our package provides a method to save and visualize your prediction results in `test`.
+The KoopmanLab provides two training and two testing methods of the compact KNO sub-family. If your scenario is single step prediction, you can consider to use `train_single` method or use `train` with `T_out = 1`. Our package provides a method to save and visualize your prediction results in `test`.
 ``` python
 MLP_KNO_2D.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 MLP_KNO_2D.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T)
