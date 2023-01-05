@@ -6,9 +6,9 @@ https://github.com/Koopman-Laboratory/KoopmanLab)
 [![License](https://img.shields.io/pypi/l/koopmanlab?color=FF7000&label=License)](
 https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 
-The fundamental package for Koopman Neural Operator with Pytorch.
+Thisi is a package for Koopman Neural Operator with Pytorch.
 
-For more information, please refer to the following: 
+For more information, please refer to the following paper, where we provided detailed mathematical derivations, computational designs, and code explanations. 
 
   - Wei Xiong, Muyuan Ma, Pei Sun and Yang Tian. "[KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023).
 
@@ -68,11 +68,11 @@ ViT_KNO.compile()
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
 ```
-Once the model is compiled, optimizer setting is required to run your own experiments. If you want a more customized setting of optimizer and scheduler, you could use any PyTorch method to create them and assign them to Koopman neural operator object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
+Once the model is compiled, an optimizer setting is required to run your own experiments. If you want a more customized setting of optimizer and scheduler, you could use any PyTorch method to create them and assign them to Koopman neural operator object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
 ``` python
 MLP_KNO_2D.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
 ```
-If you use burgers equation and navier-stokes equation data or the shallow water data provided by PDEBench, there are three specifc data interface that you can consider.
+If you use burgers equation and navier-stokes equation data or the shallow water data provided by PDEBench, there are three specifc data interfaces that you can consider.
 ``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
 train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T_out = 40, sub = 1)
@@ -93,7 +93,7 @@ MLP_KNO_2D.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader
 MLP_KNO_2D.test_single(test_loader)
 MLP_KNO_2D.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_save = True, is_plot = True)
 ```
-As for the ViT-KNO sub-family, `train` and `test` method is set in a single step predicition scenario. Specifically, `train_multi` and `test_multi` method provide multi-step iteration prediction, where the model iterates `T_out` times in training and testing. 
+As for the ViT-KNO sub-family, `train` and `test` method is set with a single step predicition scenario. Specifically, `train_multi` and `test_multi` method provide multi-step iteration prediction, where the model iterates `T_out` times in training and testing. 
 ``` python
 ViT_KNO.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 ViT_KNO.test_single(test_loader)
@@ -106,7 +106,7 @@ ViT_KNO.test_multi(test_loader)
 # test_loader: dataloader of testing, which is returning variable from torch.utils.data.DataLoader
 # T_out: the duration length required to predict
 ```
-Once your model has been trained, you can use the saving module provided in our package. Saved variable has three attribute. where `koopman` is the model class variable (i.e., the saved `kno_model` variable), `model` is the trained model variable (i.e., the saved `kno_model.kernel` variable), and `model_params` is the parameters dictionary of trained model variable (i.e., the saved `kno_model.kernel.state_dict()` variable).
+Once your model has been trained, you can use the saving module provided in KoopmanLab to save your model. Saved variable has three attribute. where `koopman` is the model class variable (i.e., the saved `kno_model` variable), `model` is the trained model variable (i.e., the saved `kno_model.kernel` variable), and `model_params` is the parameters dictionary of trained model variable (i.e., the saved `kno_model.kernel.state_dict()` variable).
 ``` python
 MLP_KNO_2D.save(save_path)
 ## Parameter definitions:
