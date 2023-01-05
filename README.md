@@ -18,7 +18,7 @@ KoopmanLab requires the following dependencies to be installed:
 - Numpy >= 1.23.2
 - Matplotlib >= 3.3.2
 
-Then you can install KoopmanLab package:
+You can install KoopmanLab package via the following approaches:
 
 - Install the stable version with `pip`:
 
@@ -34,10 +34,10 @@ $ pip install -e .
 ```
 
 # Usage
-You can read `demo_ns.py` to familiar with the basic API and workflow of our pacakge. If you want to run `demo_ns.py`, the data need to be prepared in your computing resource.
+You can read `demo_ns.py` to learn about the basic API and workflow of KoopmanLab. If you want to run `demo_ns.py`, the following data need to be prepared in your computing resource. 
 - [Dataset](https://drive.google.com/drive/folders/1UnbQh2WWc6knEHbLn-ZaXrKUZhp7pjt-)
 
-If you want to generation Navier-Stokes Equation data by yourself, the data generation configuration file can be found in the link.
+If you want to generation Navier-Stokes Equation data by yourself, the data generation configuration file can be found in the following link.
 
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
@@ -68,11 +68,11 @@ ViT_KNO.compile()
 # parallel: if data parallel is applied
 # high_freq: if high-frequency information complement is applied
 ```
-Having compiled the model, optimizer setting is indispensable. If you want some more custom optimizer and scheduler, you could use PyTorch method to create them and assign them to koopman model object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
+Once the model is compiled, optimizer setting is required to run your own experiments. If you want a more customized setting of optimizer and scheduler, you could use any PyTorch method to create them and assign them to koopman model object, eg. `MLP_KNO_2D.optimizer` and `MLP_KNO_2D.scheduler`.
 ``` python
 MLP_KNO_2D.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
 ```
-If you use burgers equation and navier-stokes equation data by the link or shallow water data by PDEBench, there are three specifc data interface are provided.
+If you use burgers equation and navier-stokes equation data or the shallow water data provided by PDEBench, there are three specifc data interface that you can consider.
 ``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
 train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T_out = 40, sub = 1)
@@ -84,16 +84,16 @@ train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 
 # Type: the viscosity coefficient of navier-stokes equation data set.
 # sub: the down-sampling scaling factor. For instance, a scaling factor sub=2 acting on a 2-dimensional data with the spatial resoluion 64*64 will create a down-sampled space of 32*32. The same factor action on a 1 dimensional data with the spatial resoluion 1*64 implies a down-sampled space of 1*32.
 ```
-We recommend you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]`, the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]`, the shape of output data and label is `[batchsize, out_chans, x, y]`.
+We recommend that you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]` and the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]` and the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
-In KNO model, The package provides two train methods and two test methods. If your scenario is single step prediction, you'd better use `train_single` method or use `train` setting `T_out = 1`. The package provides prediction result saving method and result ploting method in `test`.
+The KoopmanLab provides two training and two testing methods of the compact KNO sub-family. If your scenario is single step prediction, you can consider to use `train_single` method or use `train` setting `T_out = 1`. Our package provides a method to save and visualize your prediction results in `test`.
 ``` python
 MLP_KNO_2D.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 MLP_KNO_2D.train(epochs=ep, trainloader = train_loader, evalloader = eval_loader, T_out = T)
 MLP_KNO_2D.test_single(test_loader)
 MLP_KNO_2D.test(test_loader, T_out = T, path = "./fig/ns_time_error_1e-4/", is_save = True, is_plot = True)
 ```
-In Koopman-Vit model, `train` and `test` method for training and testing the model in single step predicition scenario. Because of Koopman-ViT structure, `train_multi` and `test_multi` method provide multi-step iteration prediction, which meanse the model is iterated by `T_out` times in training and testing method. 
+As for the ViT-KNO sub-family, `train` and `test` method is set in a single step predicition scenario. Specifically, `train_multi` and `test_multi` method provide multi-step iteration prediction, where the model iterates `T_out` times in training and testing. 
 ``` python
 ViT_KNO.train_single(epochs=ep, trainloader = train_loader, evalloader = eval_loader)
 ViT_KNO.test_single(test_loader)
@@ -106,7 +106,7 @@ ViT_KNO.test_multi(test_loader)
 # test_loader: dataloader of testing, which is returning variable from torch.utils.data.DataLoader
 # T_out: the duration length required to predict
 ```
-Having trained your own model, save module is provided in our package. Saved variable has three attribute. `koopman` is the model class variable, which means save `kno_model` variable. `model` is the trained model variable, which means save `kno_model.kernel` variable. `model_params` is the parameters dictionary of trained model variable, which means `kno_model.kernel.state_dict()` variable.
+Once your model has been trained, you can use the saving module provided in our package. Saved variable has three attribute. where `koopman` is the model class variable (i.e., the saved `kno_model` variable), `model` is the trained model variable (i.e., the saved `kno_model.kernel` variable), and `model_params` is the parameters dictionary of trained model variable (i.e., the saved `kno_model.kernel.state_dict()` variable).
 ``` python
 MLP_KNO_2D.save(save_path)
 ## Parameter definitions:
