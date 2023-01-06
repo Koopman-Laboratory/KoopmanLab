@@ -41,7 +41,7 @@ If you want to generation Navier-Stokes Equation data by yourself, the data gene
 
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
-Our package provides an easy way to create a Koopman neural operator.
+Our package provides an easy way to create a Koopman neural operator model.
 ``` python
 import koopmanlab as kp
 MLP_KNO_2D = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", device = device)
