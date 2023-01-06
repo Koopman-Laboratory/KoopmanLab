@@ -6,7 +6,7 @@ https://github.com/Koopman-Laboratory/KoopmanLab)
 [![License](https://img.shields.io/pypi/l/koopmanlab?color=FF7000&label=License)](
 https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 
-Thisi is a package for Koopman Neural Operator with Pytorch.
+This is a package for Koopman Neural Operator with Pytorch.
 
 For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
 
