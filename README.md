@@ -10,7 +10,7 @@ This is a package for Koopman Neural Operator with Pytorch.
 
 For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
 
-  - Wei Xiong, Muyuan Ma, Pei Sun and Yang Tian. "[KoopmanLab: machine learning for solving complex physics equations](https://www.researchgate.net/publication/366846352_KoopmanLab_machine_learning_for_solving_complex_physics_equations)." arXiv preprint arXiv:2301.01104 (2023). 
+  - Wei Xiong, Muyuan Ma, Ziyang Zhang, Pei Sun, and Yang Tian. "[KoopmanLab: machine learning for solving complex physics equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023). 
 
 # Installation
 KoopmanLab requires the following dependencies to be installed:
