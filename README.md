@@ -9,7 +9,7 @@ https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 This is a package for Koopman Neural Operator with Pytorch.
 
 For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
-
+  - "[Koopman neural operator as a mesh-free solver of non-linear partial differential equations](https://arxiv.org/abs/2301.10022)." arXiv preprint arXiv:2301.10022 (2023). 
   - "[KoopmanLab: machine learning for solving complex physics equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023). 
 
 # Installation
@@ -115,6 +115,13 @@ MLP_KNO_2D.save(save_path)
 # Citation
 If you use KoopmanLab package for academic research, you are encouraged to cite the following paper:
 ```
+@article{xiong2023kno,
+  title={Koopman neural operator as a mesh-free solver of non-linear partial differential equations},
+  author={Xiong, Wei and Huang, Xiaomeng and Zhang, Ziyang and Deng, Ruixuan and Sun, Pei and Tian, Yang},
+  journal={arXiv preprint arXiv:2301.10022},
+  year={2023}
+}
+
 @article{xiong2023koopmanlab,
   title={KoopmanLab: A PyTorch module of Koopman neural operator family for solving partial differential equations},
   author={Xiong, Wei and Ma, Muyuan and Sun, Pei and Tian, Yang},
