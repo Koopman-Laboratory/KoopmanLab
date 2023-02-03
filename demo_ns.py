@@ -19,6 +19,6 @@ koopman_model.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
 koopman_model.train(epochs=ep, trainloader = train_loader, evalloader = test_loader)
 time_error = koopman_model.test(test_loader, path = "./fig/ns_time_error_1e-3_conv/", is_save = True, is_plot = True)
 print(time_error)
-filename = "ns_time_error_op" + str(op) + "m" + str(m) + "d" +str(d) + ".pt"
-torch.save({"time_error":time_error,"params":a.params},"./result/ns_time_error_1e-3/"+filename)
+filename = "ns_time_error_op" + str(o) + "m" + str(m) + "d" +str(d) + ".pt"
+torch.save({"time_error":time_error,"params":koopman_model.params},"./result/ns_time_error_1e-3/"+filename)
 
