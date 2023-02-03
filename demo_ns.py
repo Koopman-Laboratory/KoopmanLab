@@ -1,8 +1,7 @@
 import torch
 import koopmanlab as kp
-
+# Setting your computing device
 torch.cuda.set_device(0)
-
 device = torch.device("cuda")
 # Loading Data
 path = "./data/ns_V1e-3_N5000_T50.mat" # Your data path
