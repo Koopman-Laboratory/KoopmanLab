@@ -5,13 +5,13 @@ torch.cuda.set_device(0)
 
 device = torch.device("cuda")
 # Loading Data
-path = "./data/ns_V1e-3_N5000_T50.mat"
+path = "./data/ns_V1e-3_N5000_T50.mat" # Your data path
 train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 10, T_out = 40, type = "1e-3", sub = 1)
 # Hyper parameters
-ep = 1
-o = 32
-m = 16
-r = 8
+ep = 1 # Training Epoch
+o = 32 # Operator Size
+m = 16 # Modes
+r = 8 # Power of Koopman Matrix
 # Model
 koopman_model = kp.model.koopman(backbone = "KNO2d", autoencoder = "MLP", o = o, m = m, r = r, t_in = 10, device = device)
 koopman_model.compile()
