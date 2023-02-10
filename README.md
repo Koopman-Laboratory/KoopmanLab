@@ -1,4 +1,7 @@
-# KoopmanLab
+<h1 align="center">
+<img src="/logo.png" width="300">
+</h1><br>
+
 [![PyPI Version](https://img.shields.io/pypi/v/koopmanlab?color=54B435&label=PyPI)](
 https://pypi.org/project/koopmanlab/)
 [![Code Sizez](https://img.shields.io/github/languages/code-size/Koopman-Laboratory/KoopmanLab?label=Code%20Size)](
