@@ -37,7 +37,7 @@ $ pip install -e .
 ```
 
 # Usage
-You can read `demo_ns.py` to learn about the basic API and workflow of KoopmanLab. If you want to run `demo_ns.py`, the following data need to be prepared in your computing resource. 
+You can read `demo_ns.py` to learn about some basic APIs and workflow of KoopmanLab. If you want to run `demo_ns.py`, the following data need to be prepared in your computing resource. 
 - [Dataset](https://drive.google.com/drive/folders/1UnbQh2WWc6knEHbLn-ZaXrKUZhp7pjt-)
 
 If you want to generate Navier-Stokes Equation data by yourself, the data generation configuration file can be found in the following link.
@@ -75,7 +75,7 @@ Once the model is compiled, an optimizer setting is required to run your own exp
 ``` python
 MLP_KNO_2D.opt_init("Adam", lr = 0.005, step_size=100, gamma=0.5)
 ```
-If you use burgers equation and navier-stokes equation data or the shallow water data provided by PDEBench, there are three specifc data interfaces that you can consider.
+If you use Burgers equation and Navier-Stokes equation data or the shallow water data provided by PDEBench, there are three specifc data interfaces that you can consider.
 ``` python
 train_loader, test_loader = kp.data.burgers(path, batch_size = 64, sub = 32)
 train_loader, test_loader = kp.data.shallow_water(path, batch_size = 5, T_in = 10, T_out = 40, sub = 1)
@@ -87,7 +87,7 @@ train_loader, test_loader = kp.data.navier_stokes(path, batch_size = 10, T_in = 
 # Type: the viscosity coefficient of navier-stokes equation data set.
 # sub: the down-sampling scaling factor. For instance, a scaling factor sub=2 acting on a 2-dimensional data with the spatial resoluion 64*64 will create a down-sampled space of 32*32. The same factor action on a 1 dimensional data with the spatial resoluion 1*64 implies a down-sampled space of 1*32.
 ```
-We recommend that you process your data by pytorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]` and the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]` and the shape of output data and label is `[batchsize, out_chans, x, y]`.
+We recommend that you process your data by PyTorch method `torch.utils.data.DataLoader`. In KNO model, the shape of 2D input data is `[batchsize, x, y, t_len]` and the shape of output data and label is `[batchsize, x, y, T]`, where t_len is defined in `kp.model.koopman` and T is defined in train module. In Koopman-ViT model, the shape of 2D input data is `[batchsize, in_chans, x, y]` and the shape of output data and label is `[batchsize, out_chans, x, y]`.
 
 The KoopmanLab provides two training and two testing methods of the compact KNO sub-family. If your scenario is single step prediction, you can consider to use `train_single` method or use `train` with `T_out = 1`. Our package provides a method to save and visualize your prediction results in `test`.
 ``` python
