@@ -40,7 +40,7 @@ $ pip install -e .
 You can read `demo_ns.py` to learn about the basic API and workflow of KoopmanLab. If you want to run `demo_ns.py`, the following data need to be prepared in your computing resource. 
 - [Dataset](https://drive.google.com/drive/folders/1UnbQh2WWc6knEHbLn-ZaXrKUZhp7pjt-)
 
-If you want to generation Navier-Stokes Equation data by yourself, the data generation configuration file can be found in the following link.
+If you want to generate Navier-Stokes Equation data by yourself, the data generation configuration file can be found in the following link.
 
 - [File](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes)
 
