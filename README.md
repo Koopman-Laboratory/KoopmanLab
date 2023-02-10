@@ -132,6 +132,8 @@ If you use KoopmanLab package for academic research, you are encouraged to cite 
   year={2023}
 }
 ```
+# Acknowledgement
+The logo of KoopmanLab are designed by Abby, a talented artist.
 
 # License
 [GPL-3.0 License](https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
