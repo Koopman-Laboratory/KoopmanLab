@@ -133,7 +133,7 @@ If you use KoopmanLab package for academic research, you are encouraged to cite 
 }
 ```
 # Acknowledgement
-Authors appreciate abby, a talented artist, for designing the logo of KoopmanLab.
+Authors appreciate Abby, a talented artist, for designing the logo of KoopmanLab.
 
 # License
 [GPL-3.0 License](https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
