@@ -9,7 +9,7 @@ https://github.com/Koopman-Laboratory/KoopmanLab)
 [![License](https://img.shields.io/pypi/l/koopmanlab?color=FF7000&label=License)](
 https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 
-This is a package for Koopman Neural Operator with Pytorch.
+KoopmanLab is a package for Koopman Neural Operator with Pytorch.
 
 For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
   - "[Koopman neural operator as a mesh-free solver of non-linear partial differential equations](https://arxiv.org/abs/2301.10022)." arXiv preprint arXiv:2301.10022 (2023). 
