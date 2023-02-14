@@ -5,3 +5,4 @@ from . import kno
 from . import koopmanViT
 from . import model
 from . import func
+from .model import koopman, koopman_vit
