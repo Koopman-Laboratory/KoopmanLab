@@ -22,7 +22,6 @@ class decoder_mlp(nn.Module):
         x = self.layer(x)
         return x
 
-
 class encoder_conv1d(nn.Module):
     def __init__(self, t_len, op_size):
         super(encoder_conv1d, self).__init__()
@@ -63,7 +62,6 @@ class decoder_conv2d(nn.Module):
         x = x.permute([0,2,3,1])
         return x
 
-
 # Koopman 1D structure
 class Koopman_Operator1D(nn.Module):
     def __init__(self, op_size, modes_x = 16):
@@ -88,7 +86,7 @@ class Koopman_Operator1D(nn.Module):
         return x
 
 class KNO1d(nn.Module):
-    def __init__(self, encoder, decoder, op_size, modes_x = 16, decompose = 4):
+    def __init__(self, encoder, decoder, op_size, modes_x = 16, decompose = 4, linear_type = True):
         super(KNO1d, self).__init__()
         # Parameter
         self.op_size = op_size
@@ -98,6 +96,7 @@ class KNO1d(nn.Module):
         self.dec = decoder
         self.koopman_layer = Koopman_Operator1D(self.op_size, modes_x = modes_x)
         self.w0 = nn.Conv1d(op_size, op_size, 1)
+        self.linear_type = linear_type # If this variable is False, activate function will be worked after Koopman Matrix
     def forward(self, x):
         # Reconstruct
         x_reconstruct = self.enc(x)
@@ -110,48 +109,23 @@ class KNO1d(nn.Module):
         x_w = x
         for i in range(self.decompose):
             x1 = self.koopman_layer(x) # Koopman Operator
-            x = torch.tanh(x + x1)
+            if self.linear_type:
+                x = x + 1
+            else:
+                x = torch.tanh(x + x1)
         x = torch.tanh(self.w0(x_w) + x)
         x = x.permute(0, 2, 1)
         x = self.dec(x) # Decoder
         return x, x_reconstruct
 
-class KNO1d_linear(nn.Module):
-    def __init__(self, encoder, decoder, op_size, modes_x = 16, decompose = 4):
-        super(KNO1d, self).__init__()
-        # Parameter
-        self.op_size = op_size
-        self.decompose = decompose
-        # Layer Structure
-        self.enc = encoder
-        self.dec = decoder
-        self.koopman_layer = Koopman_Operator1D(self.op_size, modes_x = modes_x)
-        self.w0 = nn.Conv1d(op_size, op_size, 1)
-    def forward(self, x):
-        # Reconstruct
-        x_reconstruct = self.enc(x)
-        x_reconstruct = torch.tanh(x_reconstruct)
-        x_reconstruct = self.dec(x_reconstruct)
-        # Predict
-        x = self.enc(x) # Encoder
-        x = torch.tanh(x)
-        x = x.permute(0, 2, 1)
-        x_w = x
-        for i in range(self.decompose):
-            x1 = self.koopman_layer(x) # Koopman Operator
-            x = x + x1
-        x = torch.tanh(self.w0(x_w) + x)
-        x = x.permute(0, 2, 1)
-        x = self.dec(x) # Decoder
-        return x, x_reconstruct
 # Koopman 2D structure
 class Koopman_Operator2D(nn.Module):
-    def __init__(self, op_size, modes):
+    def __init__(self, op_size, modes_x, modes_y):
         super(Koopman_Operator2D, self).__init__()
         self.op_size = op_size
         self.scale = (1 / (op_size * op_size))
-        self.modes_x = modes
-        self.modes_y = modes
+        self.modes_x = modes_x
+        self.modes_y = modes_y
         self.koopman_matrix = nn.Parameter(self.scale * torch.rand(op_size, op_size, self.modes_x, self.modes_y, dtype=torch.cfloat))
 
     # Complex multiplication
@@ -172,17 +146,19 @@ class Koopman_Operator2D(nn.Module):
         return x
 
 class KNO2d(nn.Module):
-    def __init__(self, encoder, decoder, op_size, modes = 10, decompose = 6):
+    def __init__(self, encoder, decoder, op_size, modes = 10, decompose = 6, linear_type = True):
         super(KNO2d, self).__init__()
         # Parameter
         self.op_size = op_size
         self.decompose = decompose
-        self.modes = modes
+        self.modes_x = modes
+        self.modes_y = modes
         # Layer Structure
         self.enc = encoder
         self.dec = decoder
-        self.koopman_layer = Koopman_Operator2D(self.op_size, self.modes)
+        self.koopman_layer = Koopman_Operator2D(self.op_size, self.modes_x, self.modes_y)
         self.w0 = nn.Conv2d(op_size, op_size, 1)
+        self.linear_type = linear_type # If this variable is False, activate function will be worked after Koopman Matrix
 
     def forward(self, x):
         # Reconstruct
@@ -196,7 +172,10 @@ class KNO2d(nn.Module):
         x_w = x
         for i in range(self.decompose):
             x1 = self.koopman_layer(x) # Koopman Operator
-            x = torch.tanh(x + x1)
+            if self.linear_type:
+                x = x + x1
+            else:
+                x = torch.tanh(x + x1)
         x = torch.tanh(self.w0(x_w) + x)
         x = x.permute(0, 2, 3, 1)
         x = self.dec(x) # Decoder

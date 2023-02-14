@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from timeit import default_timer
 
 class koopman:
-    def __init__(self, backbone = "KNO1d", autoencoder = "MLP", o = 16, m = 16, r = 8, t_in = 1,device = False):
+    def __init__(self, backbone = "KNO1d", autoencoder = "MLP", o = 16, m = 16, r = 8, t_in = 1, device = False):
         self.backbone = backbone
         self.autoencoder = autoencoder
         self.operator_size = o
@@ -47,7 +47,7 @@ class koopman:
             print("KNO1d model is completed.")
         
         elif self.backbone == "KNO2d":
-            self.kernel = kno.KNO2d(encoder, decoder, self.operator_size, modes = self.modes, decompose = self.decompose).to(self.device)
+            self.kernel = kno.KNO2d(encoder, decoder, self.operator_size, modes_x = self.modes, modes_y = self.modes,decompose = self.decompose).to(self.device)
             print("KNO2d model is completed.")
 
         if not self.kernel == False:
