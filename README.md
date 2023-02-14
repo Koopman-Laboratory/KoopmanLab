@@ -44,9 +44,9 @@ import koopmanlab as kp
 encoder = kp.kno.encoder_mlp(t_in, operator_size)
 decoder = kp.kno.decoder_mlp(t_in, operator_size)
 KNO1d_model = kp.kno.KNO1d(encoder, decoder, operator_size, modes_x = 16, decompose = 6)
-# Input size [batch, x, t_in] Output size [batch, x, t_in] for once ilteration
+# Input size [batch, x, t_in] Output size [batch, x, t_in] for once iteration
 KNO2d_model = kp.kno.KNO2d(encoder, decoder, operator_size, modes_x = 10, modes_y = 10, decompose = 6)
-# Input size [batch, x, t_in] Output size [batch, x, t_in] for once ilteration
+# Input size [batch, x, t_in] Output size [batch, x, t_in] for once iteration
 ```
 If you do not want to customize the algorithms for training, testing and plotting, we highly recommend that you use our basic APIs to use Koopman model.
 
