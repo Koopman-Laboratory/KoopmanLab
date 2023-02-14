@@ -111,13 +111,39 @@ class KNO1d(nn.Module):
         for i in range(self.decompose):
             x1 = self.koopman_layer(x) # Koopman Operator
             x = torch.tanh(x + x1)
-            # x = x + x1
         x = torch.tanh(self.w0(x_w) + x)
         x = x.permute(0, 2, 1)
         x = self.dec(x) # Decoder
         return x, x_reconstruct
 
-
+class KNO1d_linear(nn.Module):
+    def __init__(self, encoder, decoder, op_size, modes_x = 16, decompose = 4):
+        super(KNO1d, self).__init__()
+        # Parameter
+        self.op_size = op_size
+        self.decompose = decompose
+        # Layer Structure
+        self.enc = encoder
+        self.dec = decoder
+        self.koopman_layer = Koopman_Operator1D(self.op_size, modes_x = modes_x)
+        self.w0 = nn.Conv1d(op_size, op_size, 1)
+    def forward(self, x):
+        # Reconstruct
+        x_reconstruct = self.enc(x)
+        x_reconstruct = torch.tanh(x_reconstruct)
+        x_reconstruct = self.dec(x_reconstruct)
+        # Predict
+        x = self.enc(x) # Encoder
+        x = torch.tanh(x)
+        x = x.permute(0, 2, 1)
+        x_w = x
+        for i in range(self.decompose):
+            x1 = self.koopman_layer(x) # Koopman Operator
+            x = x + x1
+        x = torch.tanh(self.w0(x_w) + x)
+        x = x.permute(0, 2, 1)
+        x = self.dec(x) # Decoder
+        return x, x_reconstruct
 # Koopman 2D structure
 class Koopman_Operator2D(nn.Module):
     def __init__(self, op_size, modes):
