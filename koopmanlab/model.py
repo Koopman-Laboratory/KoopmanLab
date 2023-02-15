@@ -1,6 +1,6 @@
-from . import kno
-from . import utils
-from . import koopmanViT
+from koopmanlab.models import  kno
+from koopmanlab import utils
+from koopmanlab.models import koopmanViT
 
 import os
 import torch
