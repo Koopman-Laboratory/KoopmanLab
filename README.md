@@ -41,11 +41,11 @@ If you install KoopmanLab successfully, you can use our model directly by:
 
 ``` python
 import koopmanlab as kp
-encoder = kp.kno.encoder_mlp(t_in, operator_size)
-decoder = kp.kno.decoder_mlp(t_in, operator_size)
-KNO1d_model = kp.kno.KNO1d(encoder, decoder, operator_size, modes_x = 16, decompose = 6)
+encoder = kp.models.encoder_mlp(t_in, operator_size)
+decoder = kp.models.decoder_mlp(t_in, operator_size)
+KNO1d_model = kp.models.KNO1d(encoder, decoder, operator_size, modes_x = 16, decompose = 6)
 # Input size [batch, x, t_in] Output size [batch, x, t_in] for once iteration
-KNO2d_model = kp.kno.KNO2d(encoder, decoder, operator_size, modes_x = 10, modes_y = 10, decompose = 6)
+KNO2d_model = kp.models.KNO2d(encoder, decoder, operator_size, modes_x = 10, modes_y = 10, decompose = 6)
 # Input size [batch, x, t_in] Output size [batch, x, t_in] for once iteration
 ```
 If you do not want to customize the algorithms for training, testing and plotting, we highly recommend that you use our basic APIs to use Koopman model.
