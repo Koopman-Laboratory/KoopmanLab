@@ -1,6 +1,7 @@
 <h1 align="center">
 <img src="https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/logo.png" width="700">
 </h1><br>
+
 [![PyPI Version](https://img.shields.io/pypi/v/koopmanlab?color=54B435&label=PyPI)](
 https://pypi.org/project/koopmanlab/)
 [![Code Sizez](https://img.shields.io/github/languages/code-size/Koopman-Laboratory/KoopmanLab?label=Code%20Size)](
