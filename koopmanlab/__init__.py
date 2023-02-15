@@ -1,4 +1,4 @@
-__all__ = ["data","kno","model"]
+__all__ = ["data","model"]
 
 from . import data
 from . import model
