@@ -152,13 +152,13 @@ class Koopman_Operator2D(nn.Module):
         return x
 
 class KNO2d(nn.Module):
-    def __init__(self, encoder, decoder, op_size, modes = 10, decompose = 6, linear_type = True, normalization = False):
+    def __init__(self, encoder, decoder, op_size, modes_x = 10, modes_y = 10, decompose = 6, linear_type = True, normalization = False):
         super(KNO2d, self).__init__()
         # Parameter
         self.op_size = op_size
         self.decompose = decompose
-        self.modes_x = modes
-        self.modes_y = modes
+        self.modes_x = modes_x
+        self.modes_y = modes_y
         # Layer Structure
         self.enc = encoder
         self.dec = decoder
