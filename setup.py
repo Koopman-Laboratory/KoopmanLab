@@ -6,7 +6,7 @@ with io.open("README.md", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="koopmanlab",
-    version="1.0.1",
+    version="1.0.2",
     author="Wei Xiong, Tian Yang",
     author_email="xiongw21@mails.tsinghua.edu.cn",
     description="A library for Koopman Neural Operator with Pytorch",
