@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="/logo.png" width="700">
+<img src="https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/logo.png" width="700">
 </h1><br>
 
 [![PyPI Version](https://img.shields.io/pypi/v/koopmanlab?color=54B435&label=PyPI)](
