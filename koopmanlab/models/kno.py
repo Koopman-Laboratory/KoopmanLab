@@ -113,7 +113,7 @@ class KNO1d(nn.Module):
         for i in range(self.decompose):
             x1 = self.koopman_layer(x) # Koopman Operator
             if self.linear_type:
-                x = x + 1
+                x = x + x1
             else:
                 x = torch.tanh(x + x1)
         if self.normalization:
