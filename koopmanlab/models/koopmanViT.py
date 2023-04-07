@@ -50,7 +50,7 @@ class Mlp(nn.Module):
 
 
 class AFNO2D(nn.Module):
-    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1, embed_dim=768, high_freq = True):
+    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1, embed_dim=768):
         super().__init__()
         assert hidden_size % num_blocks == 0, f"hidden_size {hidden_size} should be divisble by num_blocks {num_blocks}"
 
@@ -67,13 +67,9 @@ class AFNO2D(nn.Module):
         self.w2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size * self.hidden_size_factor, self.block_size))
         self.b2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size))
         
-        self.high_freq = high_freq
         self.w = nn.Conv2d(embed_dim, embed_dim, 1) # High Frequency
     def forward(self, x):
-        if self.high_freq:
-            bias = self.w(x.permute([0,3,1,2])).permute([0,2,3,1])
-        else:
-            bias = x
+        bias = self.w(x.permute([0,3,1,2])).permute([0,2,3,1])
 
         dtype = x.dtype
         x = x.float()
@@ -143,11 +139,10 @@ class Block(nn.Module):
             sparsity_threshold=0.01,
             hard_thresholding_fraction=1.0,
             embed_dim = 768,
-            high_freq = True
         ):
         super().__init__()
         self.norm1 = norm_layer(dim)
-        self.filter = AFNO2D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction, embed_dim = embed_dim, high_freq = high_freq) 
+        self.filter = AFNO2D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction, embed_dim = embed_dim) 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         #self.drop_path = nn.Identity()
         self.norm2 = norm_layer(dim)
@@ -187,9 +182,11 @@ class ViT(nn.Module):
             sparsity_threshold=0.01,
             hard_thresholding_fraction=1.0,
             settings = "MLP",
-            high_freq = True
+            encoder_network = False,
+            decoder_network = False
         ):
         super().__init__()
+        self.encoder_network = encoder_network
         self.img_size = img_size
         self.patch_size = patch_size
         self.in_chans = in_chans
@@ -214,13 +211,13 @@ class ViT(nn.Module):
 
         self.blocks = nn.ModuleList([
             Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
-            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim, high_freq = high_freq) 
+            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim) 
         for i in range(self.depth)])
 
         self.norm = norm_layer(embed_dim)
 
-        self.head = nn.Linear(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
-        self.head_conv2d = nn.Conv2d(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], 1)
+        self.head_decoder = nn.Linear(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
+        self.head_decoder_conv2d = nn.Conv2d(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], 1)
         trunc_normal_(self.pos_embed, std=.02)
         self.apply(self._init_weights)
 
@@ -238,20 +235,23 @@ class ViT(nn.Module):
         return {'pos_embed', 'cls_token'}
     
     def encoder(self, x):
+        # Position Encoder
         B = x.shape[0]
         x = self.patch_embed(x)
         x = x + self.pos_embed
         x = self.pos_drop(x)
         x = x.reshape(B, self.h, self.w, self.embed_dim)
-
+        # Encoder Network (if reconstruction task is hard, please use more complicated structure)
+        if self.encoder_network:
+            x = self.encoder_network(x)
         return x
     
     def decoder(self, x, settings = "MLP"):
         if self.settings == "MLP":
-            x = self.head(x)
+            x = self.head_decoder(x)
         elif self.settings == "Conv2d":
             x = x.permute([0,3,1,2])
-            x = self.head_conv2d(x)
+            x = self.head_decoder_conv2d(x)
             x = x.permute([0,2,3,1])
         
         x = rearrange(
