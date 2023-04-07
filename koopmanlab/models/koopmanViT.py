@@ -48,7 +48,7 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-
+# Use linear AFNO2D sturcture to approximate linear Koopman Operator
 class AFNO2D(nn.Module):
     def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1, embed_dim=768):
         super().__init__()
