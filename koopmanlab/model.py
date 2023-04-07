@@ -282,7 +282,7 @@ class koopman:
 
 class koopman_vit:
     def __init__(self, decoder = "MLP", depth = 16, resolution=(256, 256), patch_size=(4, 4),
-            in_chans=1, out_chans=1, head_num = 16, embed_dim=768, high_freq = True, parallel = False, device = False):
+            in_chans=1, out_chans=1, head_num = 16, embed_dim=768, parallel = False, device = False):
         # Model Hyper-parameters
         self.decoder = decoder
         self.resolution = resolution
@@ -300,7 +300,6 @@ class koopman_vit:
         self.scheduler = False
         self.device = device
         self.parallel = parallel
-        self.high_freq = high_freq
         self.loss = torch.nn.MSELoss()
     def compile(self):
         self.kernel = koopmanViT.ViT(img_size=self.resolution, patch_size=self.patch_size, in_chans=self.in_chans, out_chans=self.out_chans, num_blocks=self.num_blocks, embed_dim = self.embed_dim, depth=self.depth, settings = self.decoder).to(self.device)
