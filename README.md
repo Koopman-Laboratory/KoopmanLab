@@ -12,8 +12,8 @@ https://github.com/Koopman-Laboratory/KoopmanLab/blob/main/LICENSE)
 KoopmanLab is a package for Koopman Neural Operator with Pytorch.
 
 For more information, please refer to the following paper, where we provid detailed mathematical derivations, computational designs, and code explanations. 
-  - "[Koopman neural operator as a mesh-free solver of non-linear partial differential equations](https://arxiv.org/abs/2301.10022)." arXiv preprint arXiv:2301.10022 (2023). 
-  - "[KoopmanLab: machine learning for solving complex physics equations](https://arxiv.org/abs/2301.01104)." arXiv preprint arXiv:2301.01104 (2023). 
+  - "[Koopman neural operator as a mesh-free solver of non-linear partial differential equations](https://www.researchgate.net/publication/367389048_Koopman_neural_operator_as_a_mesh-free_solver_of_non-linear_partial_differential_equations)." arXiv preprint arXiv:2301.10022 (2023). 
+  - "[KoopmanLab: machine learning for solving complex physics equations](https://www.researchgate.net/publication/366846352_KoopmanLab_machine_learning_for_solving_complex_physics_equations)." arXiv preprint arXiv:2301.01104 (2023). 
 
 # Installation
 KoopmanLab requires the following dependencies to be installed:
