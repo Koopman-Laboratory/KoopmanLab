@@ -48,9 +48,15 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-# Use linear AFNO2D sturcture to approximate linear Koopman Operator
-class AFNO2D(nn.Module):
-    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1, embed_dim=768):
+# Use linear AFNO1D sturcture to approximate linear Koopman Operator
+class AFNO1D(nn.Module):
+    """
+    hidden_size: channel dimension size
+    num_blocks: how many blocks to use in the block diagonal weight matrices (higher => less complexity but less parameters)
+    sparsity_threshold: lambda for softshrink
+    hard_thresholding_fraction: how many frequencies you want to completely mask out (lower => hard_thresholding_fraction^2 less FLOPs)
+    """
+    def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1):
         super().__init__()
         assert hidden_size % num_blocks == 0, f"hidden_size {hidden_size} should be divisble by num_blocks {num_blocks}"
 
@@ -66,64 +72,56 @@ class AFNO2D(nn.Module):
         self.b1 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size * self.hidden_size_factor))
         self.w2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size * self.hidden_size_factor, self.block_size))
         self.b2 = nn.Parameter(self.scale * torch.randn(2, self.num_blocks, self.block_size))
-        
-        self.w = nn.Conv2d(embed_dim, embed_dim, 1) # High Frequency
+
     def forward(self, x):
-        bias = self.w(x.permute([0,3,1,2])).permute([0,2,3,1])
+        bias = x
 
         dtype = x.dtype
         x = x.float()
-        B, H, W, C = x.shape
+        B, N, C = x.shape
 
-        x = torch.fft.rfft2(x, dim=(1, 2), norm="ortho")
-        x = x.reshape(B, H, W // 2 + 1, self.num_blocks, self.block_size)
+        x = torch.fft.rfft(x, dim=1, norm="ortho")
+        x = x.reshape(B, N // 2 + 1, self.num_blocks, self.block_size)
 
-        o1_real = torch.zeros([B, H, W // 2 + 1, self.num_blocks, self.block_size * self.hidden_size_factor], device=x.device)
-        o1_imag = torch.zeros([B, H, W // 2 + 1, self.num_blocks, self.block_size * self.hidden_size_factor], device=x.device)
+        o1_real = torch.zeros([B, N // 2 + 1, self.num_blocks, self.block_size * self.hidden_size_factor], device=x.device)
+        o1_imag = torch.zeros([B, N // 2 + 1, self.num_blocks, self.block_size * self.hidden_size_factor], device=x.device)
         o2_real = torch.zeros(x.shape, device=x.device)
         o2_imag = torch.zeros(x.shape, device=x.device)
 
-
-        total_modes = H // 2 + 1
+        total_modes = N // 2 + 1
         kept_modes = int(total_modes * self.hard_thresholding_fraction)
 
-        o1_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.leaky_relu(
-            torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].real, self.w1[0]) - \
-            torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].imag, self.w1[1]) + \
-            self.b1[0],
-            negative_slope = 0.01
+        o1_real[:, :kept_modes] = F.relu(
+            torch.einsum('...bi,bio->...bo', x[:, :kept_modes].real, self.w1[0]) - \
+            torch.einsum('...bi,bio->...bo', x[:, :kept_modes].imag, self.w1[1]) + \
+            self.b1[0]
         )
 
-        o1_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes] = F.leaky_relu(
-            torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].imag, self.w1[0]) + \
-            torch.einsum('...bi,bio->...bo', x[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes].real, self.w1[1]) + \
-            self.b1[1],
-            negative_slope = 0.01
+        o1_imag[:, :kept_modes] = F.relu(
+            torch.einsum('...bi,bio->...bo', x[:, :kept_modes].imag, self.w1[0]) + \
+            torch.einsum('...bi,bio->...bo', x[:, :kept_modes].real, self.w1[1]) + \
+            self.b1[1]
         )
 
-        o2_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes]  = (
-            torch.einsum('...bi,bio->...bo', o1_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes], self.w2[0]) - \
-            torch.einsum('...bi,bio->...bo', o1_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes], self.w2[1]) + \
+        o2_real[:, :kept_modes] = (
+            torch.einsum('...bi,bio->...bo', o1_real[:, :kept_modes], self.w2[0]) - \
+            torch.einsum('...bi,bio->...bo', o1_imag[:, :kept_modes], self.w2[1]) + \
             self.b2[0]
         )
 
-        o2_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes]  = (
-            torch.einsum('...bi,bio->...bo', o1_imag[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes], self.w2[0]) + \
-            torch.einsum('...bi,bio->...bo', o1_real[:, total_modes-kept_modes:total_modes+kept_modes, :kept_modes], self.w2[1]) + \
+        o2_imag[:, :kept_modes] = (
+            torch.einsum('...bi,bio->...bo', o1_imag[:, :kept_modes], self.w2[0]) + \
+            torch.einsum('...bi,bio->...bo', o1_real[:, :kept_modes], self.w2[1]) + \
             self.b2[1]
         )
 
         x = torch.stack([o2_real, o2_imag], dim=-1)
         x = F.softshrink(x, lambd=self.sparsity_threshold)
         x = torch.view_as_complex(x)
-        x = x.reshape(B, H, W // 2 + 1, C)
-        x = torch.fft.irfft2(x, s=(H, W), dim=(1,2), norm="ortho")
+        x = x.reshape(B, N // 2 + 1, C)
+        x = torch.fft.irfft(x, n=N, dim=1, norm="ortho")
         x = x.type(dtype)
-        # Linear
-        x = F.relu(x)
-        x = x + bias
-        return x
-
+        return x + bias
 
 class Block(nn.Module):
     def __init__(
@@ -138,11 +136,10 @@ class Block(nn.Module):
             num_blocks=8,
             sparsity_threshold=0.01,
             hard_thresholding_fraction=1.0,
-            embed_dim = 768,
         ):
         super().__init__()
         self.norm1 = norm_layer(dim)
-        self.filter = AFNO2D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction, embed_dim = embed_dim) 
+        self.filter = AFNO1D(dim, num_blocks, sparsity_threshold, hard_thresholding_fraction)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         #self.drop_path = nn.Identity()
         self.norm2 = norm_layer(dim)
@@ -170,20 +167,20 @@ class ViT(nn.Module):
     def __init__(
             self,
             img_size=(720, 1440),
-            patch_size=(16, 16),
-            in_chans=2,
-            out_chans=2,
+            patch_size=(8, 8),
+            in_chans=20,
+            out_chans=20,
             embed_dim=768,
-            depth=12,
+            encoder_depth = 2,
+            depth=10,
             mlp_ratio=4.,
             drop_rate=0.,
             drop_path_rate=0.,
             num_blocks=16,
             sparsity_threshold=0.01,
             hard_thresholding_fraction=1.0,
-            settings = "MLP",
-            encoder_network = False,
-            decoder_network = False
+            settings = "Conv2d",
+            encoder_network = False
         ):
         super().__init__()
         self.encoder_network = encoder_network
@@ -205,19 +202,31 @@ class ViT(nn.Module):
         self.pos_drop = nn.Dropout(p=drop_rate)
 
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, self.depth)]
-
+        self.dpr = dpr
+        
         self.h = img_size[0] // self.patch_size[0]
         self.w = img_size[1] // self.patch_size[1]
-
-        self.blocks = nn.ModuleList([
+        
+        
+        # Encoder Settings
+        self.encoder_depth = encoder_depth
+        self.encoder_blocks = nn.ModuleList([
+            Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
+            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim)
+            for i in range(encoder_depth)])
+        
+        # Koopman Layers
+        self.core_blocks = nn.ModuleList([
             Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
             num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim) 
         for i in range(self.depth)])
 
         self.norm = norm_layer(embed_dim)
-
-        self.head_decoder = nn.Linear(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
-        self.head_decoder_conv2d = nn.Conv2d(embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], 1)
+           
+        # Decoder Settings
+        self.decoder_pred_mlp = nn.Linear(self.embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
+        self.decoder_pred_conv2d = nn.ConvTranspose2d(self.embed_dim, self.out_chans, kernel_size=self.patch_size, stride=self.patch_size)
+        
         trunc_normal_(self.pos_embed, std=.02)
         self.apply(self._init_weights)
 
@@ -240,29 +249,31 @@ class ViT(nn.Module):
         x = self.patch_embed(x)
         x = x + self.pos_embed
         x = self.pos_drop(x)
-        x = x.reshape(B, self.h, self.w, self.embed_dim)
         # Encoder Network (if reconstruction task is hard, please use more complicated structure)
+        for blk in self.encoder_blocks:
+            x = blk(x)
+            
         if self.encoder_network:
             x = self.encoder_network(x)
+        
         return x
     
-    def decoder(self, x, settings = "MLP"):
+    def decoder(self, x):
+        B = x.shape[0]
+        x = x.reshape(B, self.h, self.w, self.embed_dim)
         if self.settings == "MLP":
-            x = self.head_decoder(x)
+            x = self.decoder_pred_mlp(x)
+            x = rearrange(
+                x,
+                "b h w (p1 p2 c_out) -> b c_out (h p1) (w p2)",
+                p1=self.patch_size[0],
+                p2=self.patch_size[1],
+                h=self.img_size[0] // self.patch_size[0],
+                w=self.img_size[1] // self.patch_size[1],
+            )
         elif self.settings == "Conv2d":
-            x = x.permute([0,3,1,2])
-            x = self.head_decoder_conv2d(x)
-            x = x.permute([0,2,3,1])
-        
-        x = rearrange(
-            x,
-            "b h w (p1 p2 c_out) -> b c_out (h p1) (w p2)",
-            p1=self.patch_size[0],
-            p2=self.patch_size[1],
-            h=self.img_size[0] // self.patch_size[0],
-            w=self.img_size[1] // self.patch_size[1],
-        )
-        
+            x = rearrange(x, "B H W C -> B C H W")
+            x = self.decoder_pred_conv2d(x)
         return x
     
     def forward(self, x):
@@ -270,7 +281,7 @@ class ViT(nn.Module):
         # Reconstruction
         x_recons = self.decoder(x)
         # Prediction
-        for blk in self.blocks:
+        for blk in self.core_blocks:
             x = blk(x)
         x = self.decoder(x)
         return x, x_recons
