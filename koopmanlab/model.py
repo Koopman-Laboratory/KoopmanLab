@@ -281,8 +281,8 @@ class koopman:
         torch.save({"koopman":self,"model":self.kernel,"model_params":self.kernel.state_dict()}, path)
 
 class koopman_vit:
-    def __init__(self, decoder = "MLP", depth = 16, resolution=(256, 256), patch_size=(4, 4),
-            in_chans=1, out_chans=1, head_num = 16, embed_dim=768, parallel = False, device = False):
+    def __init__(self, decoder = "Conv2d", depth = 16, resolution=(256, 256), patch_size=(4, 4),
+            in_chans=1, out_chans=1, embed_dim=768, parallel = False, device = False):
         # Model Hyper-parameters
         self.decoder = decoder
         self.resolution = resolution
@@ -290,7 +290,6 @@ class koopman_vit:
         self.in_chans = in_chans
         self.out_chans = out_chans
         self.embed_dim = embed_dim
-        self.num_blocks = head_num
         self.depth = depth
         # Core Model
         self.params = 0
