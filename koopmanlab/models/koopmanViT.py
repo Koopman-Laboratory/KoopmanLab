@@ -224,8 +224,10 @@ class ViT(nn.Module):
         self.norm = norm_layer(embed_dim)
            
         # Decoder Settings
-        self.decoder_pred_mlp = nn.Linear(self.embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
-        self.decoder_pred_conv2d = nn.ConvTranspose2d(self.embed_dim, self.out_chans, kernel_size=self.patch_size, stride=self.patch_size)
+        if self.settings == "MLP":
+            self.decoder_pred_mlp = nn.Linear(self.embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
+        elif: self.settings = "Conv2d"
+            self.decoder_pred_conv2d = nn.ConvTranspose2d(self.embed_dim, self.out_chans, kernel_size=self.patch_size, stride=self.patch_size)
         
         trunc_normal_(self.pos_embed, std=.02)
         self.apply(self._init_weights)
