@@ -140,10 +140,13 @@ If you use KoopmanLab package for academic research, you are encouraged to cite 
 }
 
 @article{xiong2023koopmanlab,
-  title={KoopmanLab: machine learning for solving complex physics equations},
+  title={Koopmanlab: machine learning for solving complex physics equations},
   author={Xiong, Wei and Ma, Muyuan and Huang, Xiaomeng and Zhang, Ziyang and Sun, Pei and Tian, Yang},
-  journal={arXiv preprint arXiv:2301.01104},
-  year={2023}
+  journal={APL Machine Learning},
+  volume={1},
+  number={3},
+  year={2023},
+  publisher={AIP Publishing}
 }
 ```
 # Acknowledgement
