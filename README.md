@@ -48,7 +48,7 @@ KNO1d_model = kp.models.KNO1d(encoder, decoder, operator_size, modes_x = 16, dec
 KNO2d_model = kp.models.KNO2d(encoder, decoder, operator_size, modes_x = 10, modes_y = 10, decompose = 6)
 # Input size [batch, x, t_in] Output size [batch, x, t_in] for once iteration
 ```
-If you do not want to customize the algorithms for training, testing and plotting, we highly recommend that you use our basic APIs to use Koopman model.
+If you do not want to customize the algorithms for training, testing and plotting, we highly recommend that you use our basic APIs to build a Koopman model.
 
 # Usage
 You can read `demo_ns.py` to learn about some basic APIs and workflow of KoopmanLab. If you want to run `demo_ns.py`, the following data need to be prepared in your computing resource. 
