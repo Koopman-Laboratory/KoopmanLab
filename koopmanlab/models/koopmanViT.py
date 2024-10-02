@@ -318,6 +318,7 @@ class ViT(nn.Module):
         
         # Encoder Settings
         self.encoder_depth = encoder_depth
+        # There are two options. Af_Block represents using the AdaptiveFNO blocks, and At_Block represents using the Fourier-Transformer blocks.
         self.encoder_blocks = nn.ModuleList([
             Af_Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
             num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction)
