@@ -48,14 +48,119 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-# Use linear AFNO1D sturcture to approximate linear Koopman Operator
+# Use Fourier-Transformer structure to approximate linear Koopman Operator
+class Attention(nn.Module):
+    def __init__(
+        self,
+        dim,
+        num_heads=8,
+        qkv_bias=False,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        input_size=(4, 14, 14),
+    ):
+        super().__init__()
+        assert dim % num_heads == 0, "dim should be divisible by num_heads"
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = qk_scale or head_dim**-0.5
+
+        self.q = nn.Linear(dim, dim, bias=qkv_bias)
+        self.k = nn.Linear(dim, dim, bias=qkv_bias)
+        self.v = nn.Linear(dim, dim, bias=qkv_bias)
+        assert attn_drop == 0.0  # do not use
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+        self.input_size = input_size
+        assert input_size[1] == input_size[2]
+
+    def forward(self, x):
+        B, N, C = x.shape
+        q = (
+            self.q(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
+        k = (
+            self.k(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
+        v = (
+            self.v(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+
+        attn = attn.softmax(dim=-1)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+        x = x.view(B, -1, C)
+        return x
+
+
+class At_Block(nn.Module):
+    """
+    Transformer Block in Fourier Domain
+    """
+    def __init__(
+        self,
+        dim=768,
+        num_heads=8,
+        mlp_ratio=4.0,
+        qkv_bias=False,
+        qk_scale=None,
+        drop=0.0,
+        attn_drop=0.0,
+        drop_path=0.0,
+        act_layer=nn.GELU,
+        norm_layer=nn.LayerNorm,
+        attn_func=Attention,
+    ):
+        super().__init__()
+        self.norm1 = norm_layer(dim)
+        self.attn = attn_func(
+            dim,
+            num_heads=num_heads,
+            qkv_bias=qkv_bias,
+            qk_scale=qk_scale,
+            attn_drop=attn_drop,
+            proj_drop=drop,
+        )
+
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        mlp_hidden_dim = int(dim * mlp_ratio)
+        self.mlp = Mlp(
+            in_features=dim,
+            hidden_features=mlp_hidden_dim,
+            act_layer=act_layer,
+            drop=drop,
+        )
+
+    def forward(self, x):
+        x_ft = torch.fft.fft(x, dim=-1, norm="ortho")
+        x_r = x_ft.real
+        x_i = x_ft.imag
+        # Calculate Real Part
+        x_r = x_r + self.drop_path(self.attn(self.norm1(x_r)))
+        x_r = x_r + self.drop_path(self.mlp(self.norm2(x_r)))
+        # Calculate Imaginary Part
+        x_i = x_i + self.drop_path(self.attn(self.norm1(x_i)))
+        x_i = x_i + self.drop_path(self.mlp(self.norm2(x_i)))
+        # Merge
+        x_ft.real = x_r
+        x_ft.imag = x_i
+        x = torch.fft.ifft(x_ft, dim=-1, norm="ortho")
+        return x
+
+# Use linear AFNO1D structure to approximate linear Koopman Operator
 class AFNO1D(nn.Module):
-    """
-    hidden_size: channel dimension size
-    num_blocks: how many blocks to use in the block diagonal weight matrices (higher => less complexity but less parameters)
-    sparsity_threshold: lambda for softshrink
-    hard_thresholding_fraction: how many frequencies you want to completely mask out (lower => hard_thresholding_fraction^2 less FLOPs)
-    """
     def __init__(self, hidden_size, num_blocks=8, sparsity_threshold=0.01, hard_thresholding_fraction=1, hidden_size_factor=1):
         super().__init__()
         assert hidden_size % num_blocks == 0, f"hidden_size {hidden_size} should be divisble by num_blocks {num_blocks}"
@@ -123,7 +228,10 @@ class AFNO1D(nn.Module):
         x = x.type(dtype)
         return x + bias
 
-class Block(nn.Module):
+class Af_Block(nn.Module):
+    """
+    AdaptiveFNO Block
+    """
     def __init__(
             self,
             dim,
@@ -211,14 +319,14 @@ class ViT(nn.Module):
         # Encoder Settings
         self.encoder_depth = encoder_depth
         self.encoder_blocks = nn.ModuleList([
-            Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
-            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim)
+            Af_Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
+            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction)
             for i in range(encoder_depth)])
         
         # Koopman Layers
         self.core_blocks = nn.ModuleList([
-            Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
-            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction, embed_dim = embed_dim) 
+            Af_Block(dim=embed_dim, mlp_ratio=mlp_ratio, drop=drop_rate, drop_path=dpr[i], norm_layer=norm_layer,
+            num_blocks=self.num_blocks, sparsity_threshold=sparsity_threshold, hard_thresholding_fraction=hard_thresholding_fraction) 
         for i in range(self.depth)])
 
         self.norm = norm_layer(embed_dim)
@@ -285,5 +393,6 @@ class ViT(nn.Module):
         # Prediction
         for blk in self.core_blocks:
             x = blk(x)
+        x = blk(x)
         x = self.decoder(x)
         return x, x_recons
