@@ -331,7 +331,10 @@ class ViT(nn.Module):
         for i in range(self.depth)])
 
         self.norm = norm_layer(embed_dim)
-           
+        
+        # High-frequency component
+        self.w0 = nn.Conv1d(embed_dim, embed_dim, 1) # or user-defined more complicated convolutional structure
+        
         # Decoder Settings
         if self.settings == "MLP":
             self.decoder_pred_mlp = nn.Linear(self.embed_dim, self.out_chans*self.patch_size[0]*self.patch_size[1], bias=False)
@@ -392,8 +395,10 @@ class ViT(nn.Module):
         # Reconstruction
         x_recons = self.decoder(x)
         # Prediction
+        x_w = self.w0(x.permute(0,2,1)).permute(0,2,1)
         for blk in self.core_blocks:
             x = blk(x)
         x = blk(x)
+        x = x + x_w
         x = self.decoder(x)
         return x, x_recons
